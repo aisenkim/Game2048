@@ -1,0 +1,24 @@
+
+body, html {
+    margin: 0;
+    height: 100%;
+}
+.container {
+  margin: 100px;
+  height: 100%;
+}
+.game_grid {
+    /* padding-left: 600px;
+    padding-top: 200px; */
+    width: 400px;
+    height: 400px;
+  }
+  .cell {
+    width: 100px;
+    height: 100px;
+    outline: 1px solid;
+    /* border : 1px solid black; */
+    float: left;
+  }
+
+ 
