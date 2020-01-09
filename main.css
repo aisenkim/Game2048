@@ -6,6 +6,13 @@ body{
   overflow: hidden;;
 }
 
+.allBlock {
+  text-align : center;
+  vertical-align : middle;
+  line-height : 100px;
+  font-size: large;
+}
+
 
 
 #gameBoard {
