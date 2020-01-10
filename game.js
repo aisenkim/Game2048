@@ -20,7 +20,6 @@ S_game.blockOnScreen = 0; //16개 이상이면 안됨
 //게임 준비하는곳
 S_game.init = function () {
     this.initGameArray();
-    console.table(this.gArray);
     this.createBlock();
     this.createBlock();
 }
@@ -29,100 +28,170 @@ S_game.init = function () {
 //16개 object를 initBlock으로부터  저장하는 배열 (초기화)
 S_game.initGameArray = function () {
     for (var i = 0; i < 4; i++) {
-        for(var j=0; j<4; j++)
-        this.gArray[i][j] = {
-            x: this.imageCoordinate[i][j].x, //left 값 image coordinate 에서 받아온 값으로 설정해주기
-            y: this.imageCoordinate[i][j].y, //top 값
-            w: DEFINE.size.w,
-            h: DEFINE.size.h,
-            num: 0, // 게임에서 숫자
+        for (var j = 0; j < 4; j++) {
+            this.gArray[i][j] = 0;
         }
     }
 }
 
-//한번 움직일때마다 새로운 블럭 생성
+
 S_game.createBlock = function () {
-    if (this.blockOnScreen > DEFINE.blockNum) //총 있을수 있는 블락 수 보다 더 많이 있다면 
-        return;
-    var ran1 = 0;
-    var ran2 = 0;
-    
-    while (1) { //비어있는 블락이 있을때 까지 루프를 돌아라 
-        ran1 = Math.floor(Math.random() * 4);
-        ran2 = Math.floor(Math.random() * 4);
-        if (this.gArray[ran1][ran2].num == 0) { //현제 새로운 블럭
-            this.gArray[ran1][ran2].num = 2;
-            this.gArray[ran1][ran2].pos = ""+ran1+ran2; //몇번째 위치인지 
-            break;
+    var options = [];
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            if (S_game.gArray[i][j] == 0) { //비어있는 인덱스 값만 넣어라 
+                options.push({
+                    x: i,
+                    y: j
+                });
+            }
         }
-        if(this.blockOnScreen == DEFINE.blockNum) break;
     }
+    if (options.length > 0) {
+        var spot = UTIL.randomArray(options);
+    } else { //비어있는 자리가 없음으로 그냥 리턴
+        console.log("No empty spot");
+        return;
+    }
+    var r = Math.random(1);
+    S_game.gArray[spot.x][spot.y] = r>0.1 ? 2 : 4;  //이건 2 아니면 4 값을 랜덤으로 배정할떄 쓰는 부분
+    // S_game.gArray[spot.x][spot.y] = 2;
 
-    S_game.blockOnScreen++; //만들어 질떄만다 하나 증가 시킨다.
-
-    //그려줄려고 스타일 주는부분
+    //생성 후 그려줘라 화면에 
     $("<div></div>").appendTo("#gameBoard")
-        .attr("id","block" + ran1 + ran2) 
+        .attr("id", "block" + spot.x + spot.y)
         .addClass("allBlock") //css div 안에 숫자 중간에 두기
         .css({
-            width: this.gArray[ran1][ran2].w,
-            height: this.gArray[ran1][ran2].h,
-            left: this.gArray[ran1][ran2].x,
-            top: this.gArray[ran1][ran2].y,
-            'background-color': 'yellow',
+            left: this.imageCoordinate[spot.x][spot.y].x,
+            top: this.imageCoordinate[spot.x][spot.y].y,
+            border: '1px solid black',
             position: 'absolute'
         })
-        .text(this.gArray[ran1][ran2].num);
-   
-    
+        .text(this.gArray[spot.x][spot.y]);
 }
 
+S_game.updateBoard = function () {
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            $('#block' + i + j).remove();
+        }
+    }
+    for (var i = 0; i < 4; i++) {
+        for (var j = 0; j < 4; j++) {
+            // if(this.gArray[i][j] == 0){
+            //     $('#block'+i+j).text(' ');
+            // } else {
+            //     $('#block'+i+j).css({
+            //         left: this.imageCoordinate[i][j].x,
+            //         top: this.imageCoordinate[i][j].y,
+            //         position: 'absolute'
+            //     })
+            //     .text(this.gArray[i][j] == 0 ? '':this.gArray[i][j]);
+            // }
 
+
+            if (this.gArray[i][j] != 0) {
+
+                $("<div></div>").appendTo("#gameBoard")
+                    .attr("id", "block" + i + j)
+                    .addClass("allBlock") //css div 안에 숫자 중간에 두기
+                    .css({
+                        left: this.imageCoordinate[i][j].x,
+                        top: this.imageCoordinate[i][j].y,
+                        border: '1px solid black',
+                        position: 'absolute'
+                    })
+                    .text(this.gArray[i][j] == 0 ? '' : this.gArray[i][j]);
+            }
+
+        }
+    }
+}
+
+//================================================================================================
+//무조건 오른쪽으로 밀어버린다 한 배열 (one row 받아서)
+S_game.slideR = function (row) {
+
+    for (var j = 0; j < 3; j++) { //3번 확인하기 위해서
+        for (var i = 3; i >= 0; i--) {
+            //0이면 아무것도 안해도됨
+            if (row[i - 1] != 0 && row[i] == 0 && i != 0) {
+                row[i] = row[i - 1];
+                row[i - 1] = 0;
+            }
+        }
+    }
+
+}
+
+S_game.combineR = function (row) {
+    for (var i = 3; i >= 0; i--) {
+        //0이면 아무것도 안해도됨
+        if (row[i] == row[i - 1] && i != 0) {
+            row[i] += row[i - 1];
+            row[i - 1] = 0;
+        }
+    }
+}
 
 S_game.moveRight = function () {
     for (var i = 0; i < 4; i++) {
-        for(var j=0; j<4; j++){
-            if(j == 0) {
-                if(this.gArray[i][j].num == this.gArray[i][j+1].num){ //다음 값이랑 같은지 확인 
-                    this.gArray[i][j+1].num += this.gArray[i][j].num;//0번쨰 1번째 같은경우 
-                    this.gArray[i][j].num = 0; //옆으로 더해서 옮김으로 비웠다
-                    this.blockOnScreen--;
-                    if(this.gArray[i][j+2].num == this.gArray[i][j+3].num){ //0이랑 1 이같으면 2번째 랑 3번째도 같은지 확인
-                        //합해라 3번째 4번쨰
-                        this.gArray[i][j+3].num += this.gArray[i][j+2].num;
-                        this.gArray[i][j+3].num = 0;
-                        this.blockOnScreen--;
-                        //첫째 둘째 합한것도 옮겨주기
-                        this.gArray[i][j+2].num = this.gArray[i][j+1].num;
-                        this.gArray[i][j+1].num = 0;
-                    }
-                } else if(this.gArray[i][j].num == this.gArray[i][j+2].num && this.gArray[i][j+1].num == 0) { //0이랑 2랑 같고  1에 값은 0인지
-                    this.gArray[i][j+2].num = this.gArray[i][j].num;
-                    this.gArray[i][j].num = 0;
-                    this.blockOnScreen--;
-                } else if(this.gArray[i][j].num == this.gArray[i][j+3].num && this.gArray[i][j+1].num == 0 && this.gArray[i][j+2].num == 0){ //0번쨰 3번째 같은지
-                    this.gArray[i][j+3].num = this.gArray[i][j].num;
-                    this.gArray[i][j].num = 0;
-                    this.blockOnScreen--;
-                }
-            }else if(j==1) {
-                if(this.gArray[i][j].num == this.gArray[i][j+1].num){
-                    this.gArray[i][j+1].num += this.gArray[i][j].num;
-                } else if(this.gArray[i][j].num == this.gArray[i][j+2].num && this.gArray[i][j+1].num == 0){
-                    this.gArray[i][j+2].num += this.gArray[i][j].num;
-                    this.gArray[i][j].num = 0;
-                    this.blockOnScreen--;
-                }
-            } else if(j ==2) {
-                if(this.gArray[i][j].num == this.gArray[i][j+1].num){
-                    this.gArray[i][j+1].num += this.gArray[i][j].num;
-                    this.gArray[i][j].num = 0;
-                    this.blockOnScreen--;
-                }
+        this.slideR(this.gArray[i]);
+        this.combineR(this.gArray[i]);
+        this.slideR(this.gArray[i]);
+    }
+}
+//================================================================================================
+
+//================================================================================================
+
+S_game.slideL = function(row) {
+    for (var j = 0; j < 3; j++) {
+        for (var i = 0; i <4; i++) {
+            //0이면 아무것도 안해도됨
+            if (row[i] == 0 && row[i+1] != 0 && i != 3) {
+                row[i] = row[i+1];
+                row[i+1] = 0;
             }
         }
     }
 }
+
+S_game.combineL = function (row) {
+    for (var i = 0; i <4; i++) {
+        //0이면 아무것도 안해도됨
+        if (row[i] == row[i + 1] && i != 3) {
+            row[i] += row[i + 1];
+            row[i + 1] = 0;
+        }
+    }
+    console.log(row);
+}
+
+S_game.moveLeft = function () {
+    for (var i = 0; i < 4; i++) {
+        this.slideL(this.gArray[i]);
+        this.combineL(this.gArray[i]);
+        this.slideL(this.gArray[i]);
+    }
+}
+//================================================================================================
+
+//================================================================================================
+
+S_game.slideU = function(row) {
+    for (var j = 0; j < 3; j++) {
+        for (var i = 0; i <4; i++) {
+            //0이면 아무것도 안해도됨
+            if (row[i] == 0 && row[i+1] != 0 && i != 3) {
+                row[i] = row[i+1];
+                row[i+1] = 0;
+            }
+        }
+    }
+}
+
+//================================================================================================
 
 
 
@@ -131,23 +200,25 @@ S_game.moveRight = function () {
 S_game.keyDown = function (e) {
     var key = e.keyCode;
 
-    console.log(key);
-
     switch (key) {
         case 37: //왼쪽 방향키
+            S_game.moveLeft();
+            S_game.updateBoard();
             S_game.createBlock();
-            
             break;
-        case 39: //오른쪽 방향키 
-        S_game.moveRight();
-        S_game.createBlock();
+        case 39: //오른쪽 방향키
+            S_game.moveRight();
+            S_game.updateBoard();
+            S_game.createBlock();
             //그려주는 함수 추가하기 (업데이트 함수)
             break;
-        case 38: //밑으로 방향키
+        case 38: //위로 방향키
+            S_game.moveUp();
+            S_game.updateBoard();
             S_game.createBlock();
             break;
-        case 40: //위로 방향키
-            S_game.createBlock();
+        case 40: //밑으로방향키
+            
             break;
     }
 }
