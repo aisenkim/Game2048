@@ -40,7 +40,7 @@ S_game.createBlock = function () {
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
             if (S_game.gArray[i][j] == 0) { //비어있는 인덱스 값만 넣어라 
-                options.push({
+                options.push({  //랜덤한 인덱스를 받기위해서 비어있는곳 인덱스를 다 넣어둔다. randomArray에 매개변수로 보낸다
                     x: i,
                     y: j
                 });
@@ -78,16 +78,6 @@ S_game.updateBoard = function () {
     }
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
-            // if(this.gArray[i][j] == 0){
-            //     $('#block'+i+j).text(' ');
-            // } else {
-            //     $('#block'+i+j).css({
-            //         left: this.imageCoordinate[i][j].x,
-            //         top: this.imageCoordinate[i][j].y,
-            //         position: 'absolute'
-            //     })
-            //     .text(this.gArray[i][j] == 0 ? '':this.gArray[i][j]);
-            // }
 
 
             if (this.gArray[i][j] != 0) {
@@ -179,6 +169,39 @@ S_game.moveLeft = function () {
 
 //================================================================================================
 
+S_game.moveUp = function () {
+    var arr = [];
+    var arr1 = [];
+    var arr2 = [];
+    var arr3 = [];
+    for (var i = 0; i < 4; i++) {
+       arr.push(S_game.gArray[i][0]);
+       arr1.push(S_game.gArray[i][1]);
+       arr2.push(S_game.gArray[i][2]);
+       arr3.push(S_game.gArray[i][3]);
+    }
+    arr = this.operateUp(arr);
+    arr1 = this.operateUp(arr1);
+    arr2 = this.operateUp(arr2);
+    arr3 = this.operateUp(arr3);
+    for(var i=0; i<4; i++) {
+        S_game.gArray[i][0] = arr[i];
+        S_game.gArray[i][1] = arr1[i];
+        S_game.gArray[i][2] = arr2[i];
+        S_game.gArray[i][3] = arr3[i];
+    }
+    
+}
+
+S_game.operateUp = function(row){
+    for (var i = 0; i < 4; i++) {
+        row = this.slideU(row);
+        row = this.combineU(row);
+        row = this.slideU(row);
+    }
+    return row;
+}
+
 S_game.slideU = function(row) {
     for (var j = 0; j < 3; j++) {
         for (var i = 0; i <4; i++) {
@@ -189,9 +212,83 @@ S_game.slideU = function(row) {
             }
         }
     }
+    return row;
+}
+
+S_game.combineU = function (row) {
+    for (var i = 0; i <4; i++) {
+        //0이면 아무것도 안해도됨
+        if (row[i] == row[i + 1] && i != 3) {
+            row[i] += row[i + 1];
+            row[i + 1] = 0;
+        }
+    }
+    return row;
 }
 
 //================================================================================================
+
+//=======================================================================================================
+
+S_game.moveDown = function () {
+    var arr = [];
+    var arr1 = [];
+    var arr2 = [];
+    var arr3 = [];
+    for (var i = 0; i < 4; i++) {
+       arr.push(S_game.gArray[i][0]);
+       arr1.push(S_game.gArray[i][1]);
+       arr2.push(S_game.gArray[i][2]);
+       arr3.push(S_game.gArray[i][3]);
+    }
+    arr = this.operateDown(arr);
+    arr1 = this.operateDown(arr1);
+    arr2 = this.operateDown(arr2);
+    arr3 = this.operateDown(arr3);
+    for(var i=0; i<4; i++) {
+        S_game.gArray[i][0] = arr[i];
+        S_game.gArray[i][1] = arr1[i];
+        S_game.gArray[i][2] = arr2[i];
+        S_game.gArray[i][3] = arr3[i];
+    }
+    
+}
+
+S_game.operateDown = function(row){
+    for (var i = 0; i < 4; i++) {
+        row = this.slideD(row);
+        row = this.combineD(row);
+        row = this.slideD(row);
+    }
+    return row;
+}
+
+S_game.slideD = function (row) {
+
+    for (var j = 0; j < 3; j++) { //3번 확인하기 위해서
+        for (var i = 3; i >= 0; i--) {
+            //0이면 아무것도 안해도됨
+            if (row[i - 1] != 0 && row[i] == 0 && i != 0) {
+                row[i] = row[i - 1];
+                row[i - 1] = 0;
+            }
+        }
+    }
+    return row;
+}
+
+S_game.combineD = function (row) {
+    for (var i = 3; i >= 0; i--) {
+        //0이면 아무것도 안해도됨
+        if (row[i] == row[i - 1] && i != 0) {
+            row[i] += row[i - 1];
+            row[i - 1] = 0;
+        }
+    }
+    return row;
+}
+
+//=======================================================================================================
 
 
 
@@ -218,7 +315,9 @@ S_game.keyDown = function (e) {
             S_game.createBlock();
             break;
         case 40: //밑으로방향키
-            
+            S_game.moveDown();
+            S_game.updateBoard();
+            S_game.createBlock();
             break;
     }
 }
