@@ -33,12 +33,17 @@ S_game.blockOnScreen = 0; //16개 이상이면 안됨
 S_game.score = 0; //총 점수 보관하는곳
 S_game.canKeyPress = true;
 
+
 //게임 준비하는곳
 S_game.init = function () {
     this.initGameBoard();
     this.initGameArray();
-    this.createBlock();
-    this.createBlock();
+    // this.createBlock();
+    // this.createBlock();
+    S_game.createBlockTestVersion(0,0,4);
+    S_game.createBlockTestVersion(0,1,4);
+    S_game.createBlockTestVersion(0,2,4);
+    S_game.createBlockTestVersion(0,3,2);
 }
 
 S_game.initGameBoard = function() {
@@ -66,8 +71,8 @@ S_game.initGameArray = function () {
         for (var j = 0; j < 4; j++) {
             this.gArray[i][j] = {
                 num : 0,
-                position : {x : 99, y : 99},
-                prevPosition: {x : 99, y : 99}
+                moveTop : 0,
+                moveLeft: 0
             }
         }
     }
@@ -75,6 +80,10 @@ S_game.initGameArray = function () {
 
 
 S_game.createBlock = function () {
+    if(S_game.blockOnScreen == 16){ //end of game
+        S_game.blockOnScreen = 0; //초기화
+        return;
+    }
     var options = [];
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
@@ -88,13 +97,15 @@ S_game.createBlock = function () {
     }
     if (options.length > 0) {
         var spot = UTIL.randomArray(options);
-    } else { //비어있는 자리가 없음으로 그냥 리턴
+        S_game.blockOnScreen++;
+    } else { //비어있는 자리가 없음으로 그냥 리턴 [재일 위에줄이랑 같은 역활 하는것]
         console.log("No empty spot");
         return;
     }
     var r = Math.random(1);
     S_game.gArray[spot.x][spot.y].num = r>0.1 ? 2 : 4;  //이건 2 아니면 4 값을 랜덤으로 배정할떄 쓰는 부분
-    this.gArray[spot.x][spot.y].position = this.imageCoordinate[spot.x][spot.y];
+    this.gArray[spot.x][spot.y].moveTop = 0;
+    this.gArray[spot.x][spot.y].moveLeft = 0;
     // S_game.gArray[spot.x][spot.y] = 2;
 
     //생성 후 그려줘라 화면에 
@@ -131,12 +142,62 @@ S_game.createBlock = function () {
     loop_scale();
 }
 
+S_game.createBlockTestVersion = function(spotX, spotY, num){
+    S_game.gArray[spotX][spotY].num = num;
+    $("<div></div>").appendTo("#gameBoard")
+        .attr("id", "block" + spotX + spotY)
+        .addClass("allBlock") //css div 안에 숫자 중간에 두기
+        .css({
+            left: this.imageCoordinate[spotX][spotY].x,
+            top: this.imageCoordinate[spotX][spotY].y,
+            // border: '1px solid black',
+            position: 'absolute',
+            'background-color' : S_game.gArray[spotX][spotY].num == 2 ? S_game.blockColor.num2 : S_game.blockColor.num4 
+        })
+        .text(this.gArray[spotX][spotY].num);
+}
+
+S_game.animateBlock = function () {
+    for (var i = 0; i < 4; i++) { //3번 확인하기 위해서
+        for (var j = 0; j < 4; j++) {
+            if ($("#block" + i + j).length) { //이 div 가 존재한다면 확인해라 안그러면 오류 생긴다
+                var pos = $("#block" + i + j).position();
+                var leftP = pos.left;
+                var topP = pos.top;
+                console.log("Left: " + S_game.gArray[i][j].moveLeft);
+                console.log("TOP: " + S_game.gArray[i][j].moveTop);
+                var checkVar = 0;
+                var loop_ani = function () {
+                    setTimeout(function () {
+                        checkVar += 20;
+                        if(checkVar > 100) //마이너스 값 움직임 대한 체크 해야함
+                            return;
+                        if (S_game.gArray[i][j].moveLeft != 0) { //그러면 좌우로 애니 움직여라
+                            $("#block" + i + j).css({
+                                left: position.left += 20
+                            })
+                        } else if (S_game.gArray[i][j].moveTop != 0) { //위아래 애니매이션으로 가라
+                            $("#block" + i + j).css({
+                                left: position.top += 20
+                            })
+                        }
+                    }, 5000);
+                    loop_ani();
+                }
+            }
+        }
+
+    }
+}
+
 S_game.updateBoard = function () {
-    // this.animateBlock();
+    this.animateBlock();
     var numColorString = '';
     for (var i = 0; i < 4; i++) { //이부분을 애니매이션 파트에 추가해주기  그리고 요기서 애니매이션 호출?? 
         for (var j = 0; j < 4; j++) {
             $('#block' + i + j).remove();
+            S_game.gArray[i][j].moveTop = 0; //다시 리셋시켜준다
+            S_game.gArray[i][j].moveLeft = 0; //다시 리셋시켜준다
         }
     }
     for (var i = 0; i < 4; i++) {
@@ -155,23 +216,10 @@ S_game.updateBoard = function () {
                     })
                     .text(this.gArray[i][j].num == 0 ? '' : this.gArray[i][j].num);
             }
-
         }
     }
 }
 
-
-//위치 변경후 position 세팅하기 위해서 
-S_game.beforeSlide = function() {
-        for (var i=0; i<4; i++) { //3번 확인하기 위해서
-            for (var j=0; j<4; j++) {
-               this.gArray[i][j].prevPosition = this.gArray[i][j].position;
-            //    this.gArray[i][j].position = "block"+i+j;
-            }
-        }
-    
-    
-}
 
 //================================================================================================
 //무조건 오른쪽으로 밀어버린다 한 배열 (one row 받아서)
@@ -182,13 +230,12 @@ S_game.slideR = function (row) {
             if (i != 0) {
                 if (row[i - 1].num != 0 && row[i].num == 0) {
                     row[i].num = row[i - 1].num;
-                    row[i].position = row[i - 1].position;
+                    row[i].moveLeft += 100;
                     row[i - 1].num = 0;
                 }
             }
         }
     }
-    console.log(row[3]);
 }
 
 S_game.combineR = function (row) {
@@ -198,7 +245,6 @@ S_game.combineR = function (row) {
             if (row[i].num == row[i - 1].num) {
                 row[i].num += row[i - 1].num;
                 S_game.score += row[i].num;//점수 더해주는 부분
-                row[i].position = row[i - 1].position;
                 row[i - 1].num = 0;
             }
         }
@@ -207,7 +253,7 @@ S_game.combineR = function (row) {
 
 S_game.moveRight = function () {
     for (var i = 0; i < 4; i++) {
-        this.beforeSlide();
+        // this.beforeSlide();
         this.slideR(this.gArray[i]);
         this.combineR(this.gArray[i]);
         this.slideR(this.gArray[i]);
@@ -224,7 +270,9 @@ S_game.slideL = function(row) {
             if (i != 3) {
                 if (row[i].num == 0 && row[i + 1].num != 0) {
                     row[i].num = row[i + 1].num;
-                    row[i].position = row[i + 1].position;
+                    row[i].moveLeft -= 100;
+                    console.log(row[i]);
+                    console.log("LEFTTTYYYYYY: " + row[i].left);
                     row[i + 1].num = 0;
                 }
             }
@@ -240,7 +288,6 @@ S_game.combineL = function (row) {
             if (row[i].num == row[i + 1].num) {
                 row[i].num += row[i + 1].num;
                 S_game.score += row[i].num;//점수 더해주는 부분
-                row[i].position = row[i + 1].position;
                 row[i + 1].num = 0;
             }
         }
@@ -249,7 +296,7 @@ S_game.combineL = function (row) {
 
 S_game.moveLeft = function () {
     for (var i = 0; i < 4; i++) {
-        this.beforeSlide();
+        // this.beforeSlide();
         this.slideL(this.gArray[i]);
         this.combineL(this.gArray[i]);
         this.slideL(this.gArray[i]);
@@ -264,7 +311,7 @@ S_game.moveUp = function () {
     var arr1 = [];
     var arr2 = [];
     var arr3 = [];
-    this.beforeSlide();
+    // this.beforeSlide();
     for (var i = 0; i < 4; i++) {
        arr.push(S_game.gArray[i][0]);
        arr1.push(S_game.gArray[i][1]);
@@ -298,7 +345,7 @@ S_game.slideU = function (row) {
             if (i != 3) {
                 if (row[i].num == 0 && row[i + 1].num != 0) {
                     row[i].num = row[i + 1].num;
-                    row[i].position = row[i + 1].position;
+                    row[i].moveTop -= 100;
                     row[i + 1].num = 0;
                 }
             }
@@ -314,7 +361,6 @@ S_game.combineU = function (row) {
             if (row[i].num == row[i + 1].num) {
                 row[i].num += row[i + 1].num;
                 S_game.score += row[i].num;//점수 더해주는 부분
-                row[i].position = row[i + 1].position;
                 row[i + 1].num = 0;
             }
         }
@@ -331,7 +377,7 @@ S_game.moveDown = function () {
     var arr1 = [];
     var arr2 = [];
     var arr3 = [];
-    this.beforeSlide();
+    // this.beforeSlide();
     for (var i = 0; i < 4; i++) {
        arr.push(S_game.gArray[i][0]);
        arr1.push(S_game.gArray[i][1]);
@@ -365,7 +411,7 @@ S_game.slideD = function (row) {
             if (i != 0) {
                 if (row[i - 1].num != 0 && row[i].num == 0) {
                     row[i].num = row[i - 1].num;
-                    row[i].position = row[i - 1].position;
+                    row[i].moveTop += 100;
                     row[i - 1].num = 0;
                 }
             }
@@ -381,7 +427,6 @@ S_game.combineD = function (row) {
             if (row[i].num == row[i - 1].num) {
                 row[i].num += row[i - 1].num;
                 S_game.score += row[i].num;//점수 더해주는 부분
-                row[i].position = row[i - 1].position;
                 row[i - 1].num = 0;
             }
         }
@@ -391,28 +436,6 @@ S_game.combineD = function (row) {
 
 //=======================================================================================================
 
-
-
-// S_game.animateBlock = function(){
-//     var currentX=0;
-//     var currentY=0;
-//     var prevX = 0;
-//     var prevY = 0;
-//     var difference = 0;
-//     for(var i=0; i<4; i++){
-//         for(var j=0; j<4; j++){
-//             currentX = S_game.gArray[i][j].position.x;
-//             currentY = S_game.gArray[i][j].position.y;
-//             prevX = S_game.gArray[i][j].prevPosition.x;
-//             prevY = S_game.gArray[i][j].prevPosition.y;
-//             $("body").keydown(function(e){
-//                 if(e.keyCode == 37 || which == 37) { //왼쪽 키 
-//                     S_game.aniInterval(i,j,currentX);
-//                 }
-//             })
-//         }
-//     }
-// }
 
 S_game.updateScore = function(){
     $("#scoreBoard").text("SCORE: " + S_game.score);

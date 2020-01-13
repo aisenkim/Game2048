@@ -160,3 +160,20 @@ S_game.combineU = function (row) {
 
 
 //======================================================================
+
+
+
+
+
+
+//위치 변경후 position 세팅하기 위해서 
+// S_game.beforeSlide = function() {
+//         for (var i=0; i<4; i++) { //3번 확인하기 위해서
+//             for (var j=0; j<4; j++) {
+//                this.gArray[i][j].prevPosition = this.gArray[i][j].position;
+//             //    this.gArray[i][j].position = "block"+i+j;
+//             }
+//         }
+    
+    
+// }
