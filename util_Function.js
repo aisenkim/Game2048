@@ -17,3 +17,35 @@ UTIL.randomArray = function (array) {
 	var ran1 = Math.floor(Math.random() * array.length);
 	return array[ran1];
 }
+
+
+UTIL.utilScale_xy_center = function (id, numX, numY) {
+
+	var scaleX = numX;
+	var scaleY = numY;
+	var originV = '50% 50%';
+	var command = 'scale(' + scaleX + ',' + scaleY + ')';
+
+	//utilConsoleLog("===>"+command);
+
+	$('#' + id).css({
+		'transform': command,
+		'-ms-transform': command,
+		/* IE 9 */
+		'-webkit-transform': command,
+		/* Safari and Chrome */
+		'-o-transform': command,
+		/* Opera */
+		'-moz-transform': command,
+		/* Firefox */
+
+		'transform-origin': originV,
+		'-ms-transform-origin': originV,
+		/* IE 9 */
+		'-webkit-transform-origin': originV,
+		/* Safari and Chrome */
+		'-o-transform-origin': originV,
+		/* Opera */
+		'-moz-transform-origin': originV /* Firefox */
+	});
+}

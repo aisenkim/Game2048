@@ -15,14 +15,49 @@ S_game.imageCoordinate = [ //화면상 위치 (left: top: 값임)
     [{x:"0px",y: "300px"},{x: "100px",y: "300px"},{x: "200px",y: "300px"},{x: "300px",y: "300px"}]
 ];
 
+S_game.blockColor = {
+    num2 : "rgb(238, 228,218)",
+    num4 : "rgb(237, 224,200)",
+    num8 : "rgb(242, 177, 121)",
+    num16 : "rgb(245 149 99)",
+    num32 : "rgb(246 124 95)",
+    num64 : "rgb(246 94 59)",
+    num128 : "rgb(237 207 114)",
+    num256 : "rgb(237 204 97)",
+    num512 : "rgb(237 200 80)",
+    num1024 : "rgb(237 197 63)",
+    num2048 : "rgb(237 194 46)",
+}
+
 S_game.blockOnScreen = 0; //16개 이상이면 안됨
+S_game.score = 0; //총 점수 보관하는곳
+S_game.canKeyPress = true;
 
 //게임 준비하는곳
 S_game.init = function () {
+    this.initGameBoard();
     this.initGameArray();
     this.createBlock();
     this.createBlock();
 }
+
+S_game.initGameBoard = function() {
+    for(var i=0; i<4; i++){
+        for(var j=0; j<4; j++){
+            $("<div></div>").appendTo("#gameBoard")
+                    .css({
+                        left: this.imageCoordinate[i][j].x,
+                        top: this.imageCoordinate[i][j].y,
+                        width : "100px",
+                        height: "100px",
+                        border: '1px solid black',
+                        position: 'absolute',
+                        'z-index' : 2
+                    });
+        }
+    }
+}
+
 
 
 //16개 object를 initBlock으로부터  저장하는 배열 (초기화)
@@ -69,14 +104,36 @@ S_game.createBlock = function () {
         .css({
             left: this.imageCoordinate[spot.x][spot.y].x,
             top: this.imageCoordinate[spot.x][spot.y].y,
-            border: '1px solid black',
-            position: 'absolute'
+            // border: '1px solid black',
+            position: 'absolute',
+            'background-color' : S_game.gArray[spot.x][spot.y].num == 2 ? S_game.blockColor.num2 : S_game.blockColor.num4 
         })
         .text(this.gArray[spot.x][spot.y].num);
+
+    //생성될때 작은상태에서 커지는 부분 
+    UTIL.utilScale_xy_center("block" + spot.x + spot.y, 0,0);
+    
+    var scaleUp = 0.2; //0.2씩 증가해서 1 만든다
+    var curScale = 0;
+    var loop_scale = function(){
+        setTimeout(function(){
+            curScale += scaleUp; 
+            if(curScale <= 1){
+                S_game.canKeyPress = false;
+                UTIL.utilScale_xy_center("block" + spot.x + spot.y, curScale,curScale);
+                loop_scale();
+            } else {
+                S_game.canKeyPress = true; // 애니매이션 끝났으니가 키 누를수 있게 해준다
+                return;
+            }
+        }, 50);
+    }
+    loop_scale();
 }
 
 S_game.updateBoard = function () {
     // this.animateBlock();
+    var numColorString = '';
     for (var i = 0; i < 4; i++) { //이부분을 애니매이션 파트에 추가해주기  그리고 요기서 애니매이션 호출?? 
         for (var j = 0; j < 4; j++) {
             $('#block' + i + j).remove();
@@ -84,8 +141,7 @@ S_game.updateBoard = function () {
     }
     for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 4; j++) {
-
-
+            numColorString = "num"+S_game.gArray[i][j].num;
             if (this.gArray[i][j].num != 0) {
 
                 $("<div></div>").appendTo("#gameBoard")
@@ -94,8 +150,8 @@ S_game.updateBoard = function () {
                     .css({
                         left: this.imageCoordinate[i][j].x,
                         top: this.imageCoordinate[i][j].y,
-                        border: '1px solid black',
-                        position: 'absolute'
+                        position: 'absolute',
+                        'background-color' : S_game.blockColor[numColorString] 
                     })
                     .text(this.gArray[i][j].num == 0 ? '' : this.gArray[i][j].num);
             }
@@ -141,6 +197,7 @@ S_game.combineR = function (row) {
         if (i != 0) {
             if (row[i].num == row[i - 1].num) {
                 row[i].num += row[i - 1].num;
+                S_game.score += row[i].num;//점수 더해주는 부분
                 row[i].position = row[i - 1].position;
                 row[i - 1].num = 0;
             }
@@ -182,6 +239,7 @@ S_game.combineL = function (row) {
         if (i != 3) {
             if (row[i].num == row[i + 1].num) {
                 row[i].num += row[i + 1].num;
+                S_game.score += row[i].num;//점수 더해주는 부분
                 row[i].position = row[i + 1].position;
                 row[i + 1].num = 0;
             }
@@ -255,6 +313,7 @@ S_game.combineU = function (row) {
         if (i != 3) {
             if (row[i].num == row[i + 1].num) {
                 row[i].num += row[i + 1].num;
+                S_game.score += row[i].num;//점수 더해주는 부분
                 row[i].position = row[i + 1].position;
                 row[i + 1].num = 0;
             }
@@ -321,6 +380,7 @@ S_game.combineD = function (row) {
         if (i != 0) {
             if (row[i].num == row[i - 1].num) {
                 row[i].num += row[i - 1].num;
+                S_game.score += row[i].num;//점수 더해주는 부분
                 row[i].position = row[i - 1].position;
                 row[i - 1].num = 0;
             }
@@ -354,33 +414,44 @@ S_game.combineD = function (row) {
 //     }
 // }
 
+S_game.updateScore = function(){
+    $("#scoreBoard").text("SCORE: " + S_game.score);
+}
 
 
 //키 이벤트 리스너
 S_game.keyDown = function (e) {
     var key = e.keyCode;
 
+    if(S_game.canKeyPress == false){ //애니메이션 중 키를 막기위해서 toggle 설정함.
+        return;
+    }
+
     switch (key) {
         case 37: //왼쪽 방향키
             S_game.moveLeft();
             S_game.updateBoard();
             S_game.createBlock();
+            S_game.updateScore();
             break;
         case 39: //오른쪽 방향키
             S_game.moveRight();
             S_game.updateBoard();
             S_game.createBlock();
+            S_game.updateScore();
             //그려주는 함수 추가하기 (업데이트 함수)
             break;
         case 38: //위로 방향키
             S_game.moveUp();
             S_game.updateBoard();
             S_game.createBlock();
+            S_game.updateScore();
             break;
         case 40: //밑으로방향키
             S_game.moveDown();
             S_game.updateBoard();
             S_game.createBlock();
+            S_game.updateScore();
             break;
     }
 }
