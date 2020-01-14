@@ -177,3 +177,29 @@ S_game.combineU = function (row) {
     
     
 // }
+
+
+
+
+
+
+
+//요기서 합침 애니매이션 넣기 [커졌다가 줄어들기]
+UTIL.utilScale_xy_center("block" + i + j, 0, 0);
+
+var scaleUp = 0.2; //0.2씩 증가해서 1 만든다
+var curScale = 2.0;
+var loop_scale = function () {
+    setTimeout(function () {
+        curScale -= scaleUp;
+        if (curScale >= 1) {
+            // S_game.canKeyPress = false; //요기 있는걸 블럭 옮기는 애니매이션에다가 넣어두기
+            UTIL.utilScale_xy_center("block" + i + j, curScale, curScale);
+            loop_scale();
+        } else {
+            return;
+        }
+    }, 3000);
+}
+loop_scale();
+    }
