@@ -548,9 +548,16 @@ S_game.keyDown = function (e) {
             S_game.updateScore();
             break;
     }
+
 }
+    $("#button-left").click(function(){
+        
+        alert("hello");
+    });
+
 
 document.onkeydown = S_game.keyDown;
+
 
 //2048 실행시 가장먼저 실행되는 부분
 window.onload = function () {
