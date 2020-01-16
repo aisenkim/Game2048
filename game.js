@@ -448,16 +448,16 @@ S_game.moveDown = function () {
     var arr3 = [];
     // this.beforeSlide();
     for (var i = 0; i < 4; i++) {
-       arr.push(S_game.gArray[i][0]);
-       arr1.push(S_game.gArray[i][1]);
-       arr2.push(S_game.gArray[i][2]);
-       arr3.push(S_game.gArray[i][3]);
+        arr.push(S_game.gArray[i][0]);
+        arr1.push(S_game.gArray[i][1]);
+        arr2.push(S_game.gArray[i][2]);
+        arr3.push(S_game.gArray[i][3]);
     }
-    arr = this.operateDown(arr,0);
-    arr1 = this.operateDown(arr1,1);
-    arr2 = this.operateDown(arr2,2);
-    arr3 = this.operateDown(arr3,3);
-    for(var i=0; i<4; i++) {
+    arr = this.operateDown(arr, 0);
+    arr1 = this.operateDown(arr1, 1);
+    arr2 = this.operateDown(arr2, 2);
+    arr3 = this.operateDown(arr3, 3);
+    for (var i = 0; i < 4; i++) {
         S_game.gArray[i][0] = arr[i];
         S_game.gArray[i][1] = arr1[i];
         S_game.gArray[i][2] = arr2[i];
@@ -465,7 +465,7 @@ S_game.moveDown = function () {
     }
 }
 
-S_game.operateDown = function(row,idx){
+S_game.operateDown = function (row, idx) {
     this.storeBeforePosID(row, idx);
     row = this.slideD(row);
     row = this.combineD(row);
@@ -482,8 +482,8 @@ S_game.slideD = function (row) {
             if (i != 0) {
                 if (row[i - 1].num != 0 && row[i].num == 0) {
                     temp = row[i];
-                    row[i] = row[i-1];
-                    row[i-1] = temp;
+                    row[i] = row[i - 1];
+                    row[i - 1] = temp;
                 }
             }
         }
@@ -497,12 +497,12 @@ S_game.combineD = function (row) {
         //0이면 아무것도 안해도됨
         if (i != 0) {
             if (row[i].num == row[i - 1].num) {
-                row[i-1].num += row[i].num;
-                S_game.score += row[i-1].num;//점수 더해주는 부분
-                temp = row[i-1];
-                row[i-1] = row[i];
+                row[i - 1].num += row[i].num;
+                S_game.score += row[i - 1].num; //점수 더해주는 부분
+                temp = row[i - 1];
+                row[i - 1] = row[i];
                 row[i] = temp;
-                row[i-1].num = 0;
+                row[i - 1].num = 0;
             }
         }
     }
@@ -512,7 +512,7 @@ S_game.combineD = function (row) {
 //=======================================================================================================
 
 
-S_game.updateScore = function(){
+S_game.updateScore = function () {
     $("#scoreBoard").text("SCORE: " + S_game.score);
 }
 
@@ -521,7 +521,7 @@ S_game.updateScore = function(){
 S_game.keyDown = function (e) {
     var key = e.keyCode;
 
-    if(S_game.canKeyPress == false){ //애니메이션 중 키를 막기위해서 toggle 설정함.
+    if (S_game.canKeyPress == false) { //애니메이션 중 키를 막기위해서 toggle 설정함.
         return;
     }
 
@@ -550,14 +550,78 @@ S_game.keyDown = function (e) {
     }
 
 }
-    $("#button-left").click(function(){
-        
-        alert("hello");
-    });
+
+
+
+S_game.onclick = function () {
+    // $("button").unbind().click(function(e){
+    //     var clicked = e.target.id;
+    //     console.log(clicked);
+    //     // switch(clicked){
+            
+    //     // }
+    // })
+    // $("#button-left").unbind().click(function () {
+    //     S_game.moveLeft();
+    //     S_game.updateBoard();
+    //     S_game.updateScore();
+    //     return;
+    // });
+    // $("#button-right").unbind().click(function () {
+    //     S_game.moveRight();
+    //     S_game.updateBoard();
+    //     S_game.updateScore();
+    //     return;
+    // });
+    // $("#button-up").unbind().click(function () {
+    //     S_game.moveUp();
+    //     S_game.updateBoard();
+    //     S_game.updateScore();
+    //     return;
+    // });
+    // $("#button-down").unbind().click(function () {
+    //     S_game.moveDown();
+    //     S_game.updateBoard();
+    //     S_game.updateScore();
+    //     return;
+    // });
+   
+}
+
+//swipe function
+
+$(document).on("swipeleft", '#gameBoard', function(){
+    S_game.moveLeft();
+    S_game.updateBoard();
+    S_game.updateScore();
+})
+$(document).on("swiperight", '#gameBoard', function(){
+    S_game.moveRight();
+        S_game.updateBoard();
+        S_game.updateScore();
+})
+$(document).on("swipeup", '#gameBoard', function(){
+    S_game.moveUp();
+        S_game.updateBoard();
+        S_game.updateScore();
+})
+$(document).on("swipedown", '#gameBoard', function(){
+    S_game.moveDown();
+        S_game.updateBoard();
+        S_game.updateScore();
+})
+
+
 
 
 document.onkeydown = S_game.keyDown;
+document.onclick = S_game.onclick;
 
+// $(document.documentElement).select(function(){
+//     $('#button-right').on("swiperight", function(){
+//         console.log("righttty");
+//     })
+// })
 
 //2048 실행시 가장먼저 실행되는 부분
 window.onload = function () {
