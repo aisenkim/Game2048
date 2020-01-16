@@ -195,7 +195,6 @@ S_game.animateBlock = function () {
                 afterPos = S_game.gArray[i][j].afterPosition;
                 difLeft = parseInt(afterPos.x) - parseInt(beforePos.x);
                 difTop = parseInt(afterPos.y) - parseInt(beforePos.y);
-                console.log("after.x: " + parseInt(afterPos.y) + " - " + "before.x: " + parseInt(beforePos.y));
                 if (difLeft != 0) {
                     $(beforeID).animate({
                         left: "+=" + difLeft
@@ -554,37 +553,32 @@ S_game.keyDown = function (e) {
 
 
 S_game.onclick = function () {
-    // $("button").unbind().click(function(e){
-    //     var clicked = e.target.id;
-    //     console.log(clicked);
-    //     // switch(clicked){
-            
-    //     // }
-    // })
-    // $("#button-left").unbind().click(function () {
-    //     S_game.moveLeft();
-    //     S_game.updateBoard();
-    //     S_game.updateScore();
-    //     return;
-    // });
-    // $("#button-right").unbind().click(function () {
-    //     S_game.moveRight();
-    //     S_game.updateBoard();
-    //     S_game.updateScore();
-    //     return;
-    // });
-    // $("#button-up").unbind().click(function () {
-    //     S_game.moveUp();
-    //     S_game.updateBoard();
-    //     S_game.updateScore();
-    //     return;
-    // });
-    // $("#button-down").unbind().click(function () {
-    //     S_game.moveDown();
-    //     S_game.updateBoard();
-    //     S_game.updateScore();
-    //     return;
-    // });
+    
+    $("#button-left").unbind().click(function () {
+        S_game.moveLeft();
+        S_game.updateBoard();
+        S_game.updateScore();
+        console.log("Clicked");
+        return;
+    });
+    $("#button-right").unbind().click(function () {
+        S_game.moveRight();
+        S_game.updateBoard();
+        S_game.updateScore();
+        return;
+    });
+    $("#button-up").unbind().click(function () {
+        S_game.moveUp();
+        S_game.updateBoard();
+        S_game.updateScore();
+        return;
+    });
+    $("#button-down").unbind().click(function () {
+        S_game.moveDown();
+        S_game.updateBoard();
+        S_game.updateScore();
+        return;
+    });
    
 }
 
@@ -594,6 +588,7 @@ $(document).on("swipeleft", '#gameBoard', function(){
     S_game.moveLeft();
     S_game.updateBoard();
     S_game.updateScore();
+    console.log("Swipe Left");
 })
 $(document).on("swiperight", '#gameBoard', function(){
     S_game.moveRight();
