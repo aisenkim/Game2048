@@ -211,8 +211,19 @@ S_game.animateBlock = function () {
 
 }
 
-S_game.restartGame = function() {
-    
+
+S_game.resetGame = function () {
+    for (var i = 0; i < 4; i++) { //이부분을 애니매이션 파트에 추가해주기  그리고 요기서 애니매이션 호출?? 
+        for (var j = 0; j < 4; j++) {
+            $('#block' + i + j).remove();
+            S_game.blockOnScreen = 0; //화면에 있는 블락 수 다 지워준다
+        }
+    }
+    S_game.initGameArray();
+    S_game.createBlock();
+    S_game.createBlock();
+    S_game.score = 0;
+    $("#scoreBoard").text(0);
 }
 
 S_game.updateBoard = function () {
@@ -585,6 +596,10 @@ S_game.onclick = function () {
     });
    
 }
+
+$(document).unbind().on("click", "#playAgain", function(){
+    S_game.resetGame();
+})
 
 //swipe function
 
