@@ -40,6 +40,17 @@ body {
   position: absolute;
 }
 
+#playAgain {
+  position : absolute;
+  left : 220px;
+  top : 20px;
+}
+
+#playAgain>img{
+  width : 100px;
+  height : 100px;
+}
+
 #scoreBoard {
   left: 340px;
   top: 45px;

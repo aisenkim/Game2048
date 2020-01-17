@@ -211,6 +211,10 @@ S_game.animateBlock = function () {
 
 }
 
+S_game.restartGame = function() {
+    
+}
+
 S_game.updateBoard = function () {
     this.animateBlock();
     var numColorString = '';
