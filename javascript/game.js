@@ -231,7 +231,8 @@ S_game.updateBoard = function () {
                             left: S_game.imageCoordinate[i][j].x,
                             top: S_game.imageCoordinate[i][j].y,
                             position: 'absolute',
-                            'background-color': S_game.blockColor[numColorString]
+                            'background-color': S_game.blockColor[numColorString],
+                            color : S_game.gArray[i][j].num == 2 || S_game.gArray[i][j].num == 4 ? 'black' : 'white'
                         })
                         .text(S_game.gArray[i][j].num == 0 ? '' : S_game.gArray[i][j].num);
                 }

@@ -16,9 +16,11 @@ body {
   text-align: center;
   vertical-align: middle;
   line-height: 100px;
-  font-size: large;
+  font-size: 40px;
   width: 100px;
   height: 100px;
+  font-weight : bold;
+  color : #654321
 }
 
 #container {
